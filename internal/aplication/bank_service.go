@@ -1,5 +1,10 @@
 package aplication
 
+import (
+	"github.com/mahfuzon/grpc-server/internal/port"
+	"log"
+)
+
 /**
 * Author Company: PT. ASLI ISOAE SOLUSINE
 * Author Url: www.isoae.id
@@ -12,8 +17,17 @@ package aplication
 **/
 
 type BankService struct {
+	db port.BankDbPort
+}
+
+func NewBankService(db port.BankDbPort) *BankService {
+	return &BankService{db: db}
 }
 
 func (s *BankService) FindCurrentBalance(acc string) float64 {
-	return 999
+	bankAccount, err := s.db.GetBankAccountByAccountNumber(acc)
+	if err != nil {
+		log.Println("error finding current balance:", err)
+	}
+	return bankAccount.CurrentBalance
 }

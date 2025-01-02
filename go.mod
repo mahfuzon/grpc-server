@@ -4,6 +4,7 @@ go 1.23
 
 require (
 	github.com/golang-migrate/migrate/v4 v4.18.1
+	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/mahfuzon/grpc-proto v0.0.4
 	google.golang.org/genproto v0.0.0-20241219192143-6b3ec007d9bb
