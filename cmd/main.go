@@ -7,7 +7,10 @@ import (
 	"github.com/mahfuzon/grpc-server/internal/adapter/db"
 	"github.com/mahfuzon/grpc-server/internal/adapter/grpc"
 	"github.com/mahfuzon/grpc-server/internal/aplication"
+	"github.com/mahfuzon/grpc-server/internal/aplication/domain/bank"
 	"log"
+	"math/rand"
+	"time"
 )
 
 func main() {
@@ -24,8 +27,31 @@ func main() {
 	}
 
 	bankService := aplication.NewBankService(dbAdapter)
+	go generateExchangeRate(bankService, "USD", "IDR", time.Second*5)
 
 	grpcAdapter := grpc.NewGrpcAdapter(bankService, 9090)
 
 	grpcAdapter.Run()
+}
+
+func generateExchangeRate(bs *aplication.BankService, fromCurrency, toCurrency string, duration time.Duration) {
+	ticker := time.NewTicker(duration)
+	for range ticker.C {
+		now := time.Now()
+		validFrom := now.Truncate(time.Second).Add(3 * time.Second)
+		validTo := validFrom.Add(duration).Add(-1 * time.Millisecond)
+
+		dummyRate := bank.ExchangeRate{
+			FromCurrency:       fromCurrency,
+			ToCurrency:         toCurrency,
+			Rate:               200 + float64(rand.Intn(100)),
+			ValidFromTimeStamp: validFrom,
+			ValidToTimeStamp:   validTo,
+		}
+
+		_, err := bs.CreateExchangeRate(dummyRate)
+		if err != nil {
+			log.Printf("failed to create exchange rate: %v", err)
+		}
+	}
 }

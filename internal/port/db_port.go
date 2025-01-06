@@ -1,7 +1,9 @@
 package port
 
 import (
+	"github.com/google/uuid"
 	"github.com/mahfuzon/grpc-server/internal/adapter/db"
+	"time"
 )
 
 /**
@@ -17,4 +19,6 @@ import (
 
 type BankDbPort interface {
 	GetBankAccountByAccountNumber(accountNumber string) (db.BankAccountOrm, error)
+	CreateExchangeRate(orm db.BankExchangeRateOrm) (uuid.UUID, error)
+	GetExchangeRateAtTimeStamp(fromCurrency, toCurrency string, ts time.Time) (db.BankExchangeRateOrm, error)
 }
